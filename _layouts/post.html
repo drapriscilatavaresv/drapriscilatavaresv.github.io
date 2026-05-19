@@ -67,7 +67,11 @@
 <div class="container">
   <div class="artigo-layout">
     <article class="artigo-conteudo">
+      {% if page.imagem %}
+      <img src="{{ page.imagem }}" alt="{{ page.title }}" style="width:100%;max-height:420px;object-fit:cover;border-radius:var(--r-g);margin-bottom:2.5rem;">
+      {% else %}
       <div style="font-size:5rem;text-align:center;padding:2.5rem;background:{{ emoji_bg }};border-radius:var(--r-g);margin-bottom:2.5rem;">{{ page.emoji }}</div>
+      {% endif %}
 
       <div class="artigo-corpo">
         {{ content }}
