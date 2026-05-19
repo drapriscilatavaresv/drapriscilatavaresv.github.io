@@ -1,0 +1,14 @@
+title: Dra. Priscila Tavares
+url: https://www.drapriscilatavaresv.com.br
+baseurl: ""
+lang: pt-BR
+
+permalink: /blog/:slug.html
+
+plugins:
+  - jekyll-sitemap
+
+exclude:
+  - README.md
+  - TUTORIAL-BLOG.md
+  - "*.sh"

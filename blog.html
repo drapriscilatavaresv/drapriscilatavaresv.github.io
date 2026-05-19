@@ -1,3 +1,5 @@
+---
+---
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -51,46 +53,23 @@
       <!-- Posts -->
       <main class="blog-principal">
         <div style="display:flex;flex-direction:column;gap:1.75rem;">
-
+          {% assign meses = "janeiro,fevereiro,março,abril,maio,junho,julho,agosto,setembro,outubro,novembro,dezembro" | split: "," %}
+          {% for post in site.posts %}
+            {% assign mi = post.date | date: "%-m" | minus: 1 %}
+            {% assign mes = meses[mi] %}
           <article class="post-card" style="flex-direction:row;min-height:0;">
-            <div class="post-capa post-capa-rosa" style="width:200px;flex-shrink:0;aspect-ratio:auto;border-radius:0;">☀️</div>
+            <div class="post-capa {{ post.capa_class }}" style="width:200px;flex-shrink:0;aspect-ratio:auto;border-radius:0;">{{ post.emoji }}</div>
             <div class="post-corpo">
-              <div class="post-categoria">Suplementação</div>
-              <h2 class="post-titulo" style="font-size:1.15rem;"><a href="blog/vitamina-d.html">Vitamina D: por que quase toda mulher brasileira tem deficiência?</a></h2>
-              <p class="post-resumo">Apesar de vivermos em um país tropical, a deficiência de vitamina D é alarmante entre as mulheres brasileiras. Entenda o porquê e o que fazer.</p>
+              <div class="post-categoria">{{ post.category }}</div>
+              <h2 class="post-titulo" style="font-size:1.15rem;"><a href="{{ post.url }}">{{ post.title }}</a></h2>
+              <p class="post-resumo">{{ post.resumo }}</p>
               <div class="post-rodape">
-                <span>10 de abril de 2025 · 5 min de leitura</span>
-                <a href="blog/vitamina-d.html" class="post-ler">Ler artigo <span>→</span></a>
+                <span>{{ post.date | date: "%-d" }} de {{ mes }} de {{ post.date | date: "%Y" }} · {{ post.reading_time }} min de leitura</span>
+                <a href="{{ post.url }}" class="post-ler">Ler artigo <span>→</span></a>
               </div>
             </div>
           </article>
-
-          <article class="post-card" style="flex-direction:row;min-height:0;">
-            <div class="post-capa post-capa-creme" style="width:200px;flex-shrink:0;aspect-ratio:auto;border-radius:0;">🌙</div>
-            <div class="post-corpo">
-              <div class="post-categoria">Bem-estar</div>
-              <h2 class="post-titulo" style="font-size:1.15rem;"><a href="blog/magnesio.html">Magnésio: o mineral que pode transformar sua ansiedade e qualidade do sono</a></h2>
-              <p class="post-resumo">O magnésio é um dos minerais mais deficientes na população feminina e um dos mais importantes para o sistema nervoso e equilíbrio emocional.</p>
-              <div class="post-rodape">
-                <span>25 de abril de 2025 · 4 min de leitura</span>
-                <a href="blog/magnesio.html" class="post-ler">Ler artigo <span>→</span></a>
-              </div>
-            </div>
-          </article>
-
-          <article class="post-card" style="flex-direction:row;min-height:0;">
-            <div class="post-capa post-capa-vinho" style="width:200px;flex-shrink:0;aspect-ratio:auto;border-radius:0;">🩸</div>
-            <div class="post-corpo">
-              <div class="post-categoria">Saúde Hormonal</div>
-              <h2 class="post-titulo" style="font-size:1.15rem;"><a href="blog/ferro.html">Ferro e cansaço feminino: o que os exames não estão te contando</a></h2>
-              <p class="post-resumo">Seus exames voltaram "normais" mas você ainda está exausta? Entenda por que a ferritina é o marcador mais importante — e o mais ignorado.</p>
-              <div class="post-rodape">
-                <span>8 de maio de 2025 · 5 min de leitura</span>
-                <a href="blog/ferro.html" class="post-ler">Ler artigo <span>→</span></a>
-              </div>
-            </div>
-          </article>
-
+          {% endfor %}
         </div>
       </main>
 
