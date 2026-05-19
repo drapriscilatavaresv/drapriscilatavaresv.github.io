@@ -175,6 +175,15 @@
           <label>Resumo do card (aparece na listagem do blog)</label>
           <textarea class="input" id="f-resumo" rows="2" placeholder="1 a 2 frases resumindo o artigo" style="margin:0;resize:vertical"></textarea>
         </div>
+        <div class="form-grupo full">
+          <label>Imagem de capa <span style="font-weight:400;color:#888">(opcional — substitui o emoji; recomendado .webp)</span></label>
+          <div id="imagem-preview-wrap" style="display:none;margin-bottom:.75rem;">
+            <img id="imagem-preview" src="" alt="Preview" style="max-height:200px;border-radius:10px;border:1.5px solid var(--borda);">
+            <button type="button" onclick="removerImagem()" style="display:block;margin-top:.4rem;font-size:.78rem;color:#c0392b;background:none;border:none;cursor:pointer;">✕ Remover imagem</button>
+          </div>
+          <div id="imagem-atual" style="font-size:.82rem;color:#888;margin-bottom:.5rem;display:none"></div>
+          <input type="file" id="f-imagem" accept=".webp" style="font-size:.85rem;" onchange="previewImagem(this)">
+        </div>
       </div>
 
       <div style="margin:1rem 0">
@@ -272,6 +281,18 @@ async function ghGetContents(path) {
   return ghGet(`repos/${REPO}/contents/${path}?ref=${BRANCH}`);
 }
 
+async function ghPutBinario(path, base64, sha, mensagem) {
+  const body = { message: mensagem, content: base64, branch: BRANCH };
+  if (sha) body.sha = sha;
+  const r = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
+    method: 'PUT',
+    headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (!r.ok) { const e = await r.json(); throw new Error(e.message); }
+  return r.json();
+}
+
 async function ghPut(path, content, sha, mensagem) {
   const body = { message: mensagem, content: btoa(unescape(encodeURIComponent(content))), branch: BRANCH };
   if (sha) body.sha = sha;
@@ -337,6 +358,7 @@ function novoArtigo() {
   document.getElementById('f-descricao').value = '';
   document.getElementById('f-resumo').value = '';
   document.getElementById('f-cta').value = 'Se você se identificou com algum dos sintomas descritos, agende uma consulta para avaliarmos o seu caso de forma individualizada.';
+  removerImagem();
   setStatus('status-editor','','');
   mostrarTela('editor');
   iniciarEditor('');
@@ -363,6 +385,18 @@ async function editarPost(nome) {
     document.getElementById('f-descricao').value = front.description || '';
     document.getElementById('f-resumo').value = front.resumo || '';
     document.getElementById('f-cta').value = front.cta_text || '';
+    imagemBase64 = null;
+    imagemNome = null;
+    imagemCaminhoAtual = front.imagem || null;
+    document.getElementById('imagem-preview-wrap').style.display = 'none';
+    document.getElementById('f-imagem').value = '';
+    if (front.imagem) {
+      const el = document.getElementById('imagem-atual');
+      el.textContent = `Imagem atual: ${front.imagem}`;
+      el.style.display = 'block';
+    } else {
+      document.getElementById('imagem-atual').style.display = 'none';
+    }
     setStatus('status-editor','','');
     iniciarEditor(corpo);
   } catch(e) {
@@ -390,11 +424,12 @@ async function publicar() {
     setStatus('status-editor','Preencha pelo menos Título, Data e Conteúdo.','erro'); return;
   }
   setStatus('status-editor','Publicando...','carregando');
-  const slug = titulo.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9\s-]/g,'').trim().replace(/\s+/g,'-');
-  const nomeArquivo = arquivoEditando || `${data}-${slug}.md`;
-  const frontMatter = gerarFrontMatter(titulo, data);
-  const conteudoFinal = `${frontMatter}\n${corpo}\n`;
   try {
+    const caminhoImagem = await uploadImagemSeNecessario();
+    const slug = titulo.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9\s-]/g,'').trim().replace(/\s+/g,'-');
+    const nomeArquivo = arquivoEditando || `${data}-${slug}.md`;
+    const frontMatter = gerarFrontMatter(titulo, data, caminhoImagem);
+    const conteudoFinal = `${frontMatter}\n${corpo}\n`;
     await ghPut(`_posts/${nomeArquivo}`, conteudoFinal, shaEditando, `${arquivoEditando ? 'Atualiza' : 'Novo artigo'}: ${titulo}`);
     setStatus('status-editor','✅ Artigo publicado! O site atualiza em 1-2 minutos.','ok');
     arquivoEditando = nomeArquivo;
@@ -413,9 +448,47 @@ async function excluirPost(nome) {
   } catch(e) { alert('Erro ao excluir.'); }
 }
 
+// ── Imagens ────────────────────────────────────────────────
+let imagemBase64 = null;
+let imagemNome = null;
+let imagemCaminhoAtual = null;
+
+function previewImagem(input) {
+  const arquivo = input.files[0];
+  if (!arquivo) return;
+  imagemNome = arquivo.name.toLowerCase().replace(/\s+/g,'-');
+  const reader = new FileReader();
+  reader.onload = e => {
+    imagemBase64 = e.target.result.split(',')[1];
+    document.getElementById('imagem-preview').src = e.target.result;
+    document.getElementById('imagem-preview-wrap').style.display = 'block';
+    document.getElementById('imagem-atual').style.display = 'none';
+  };
+  reader.readAsDataURL(arquivo);
+}
+
+function removerImagem() {
+  imagemBase64 = null;
+  imagemNome = null;
+  imagemCaminhoAtual = null;
+  document.getElementById('f-imagem').value = '';
+  document.getElementById('imagem-preview-wrap').style.display = 'none';
+  document.getElementById('imagem-atual').style.display = 'none';
+}
+
+async function uploadImagemSeNecessario() {
+  if (!imagemBase64 || !imagemNome) return imagemCaminhoAtual;
+  const caminho = `assets/images/blog/${imagemNome}`;
+  let sha = null;
+  try { const ex = await ghGetContents(caminho); sha = ex.sha; } catch(e) {}
+  await ghPutBinario(caminho, imagemBase64, sha, `Upload imagem: ${imagemNome}`);
+  return `/${caminho}`;
+}
+
 // ── Utilitários ────────────────────────────────────────────
-function gerarFrontMatter(titulo, data) {
+function gerarFrontMatter(titulo, data, caminhoImagem) {
   const f = (id) => document.getElementById(id).value;
+  const imgLinha = caminhoImagem ? `\nimagem: "${caminhoImagem}"` : '';
   return `---
 layout: post
 title: "${titulo.replace(/"/g,'\\"')}"
@@ -428,7 +501,7 @@ reading_time: ${f('f-leitura')}
 description: "${f('f-descricao').replace(/"/g,'\\"')}"
 resumo: "${f('f-resumo').replace(/"/g,'\\"')}"
 cta_text: "${f('f-cta').replace(/"/g,'\\"')}"
-whatsapp_text: "${f('f-wpp').replace(/"/g,'\\"')}"
+whatsapp_text: "${f('f-wpp').replace(/"/g,'\\"')}"${imgLinha}
 ---\n`;
 }
 
