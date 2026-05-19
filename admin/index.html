@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel do Blog — Dra. Priscila Tavares</title>
+  <link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{--vinho:#7A2840;--rose:#C4956A;--creme:#FAF7F2;--borda:#E8DDD5;--texto:#2C1A12}
+    body{font-family:Inter,system-ui,sans-serif;background:var(--creme);color:var(--texto);min-height:100vh}
+    .topo{background:var(--vinho);color:#fff;padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between}
+    .topo h1{font-size:1.1rem;font-weight:600}
+    .topo-acoes{display:flex;gap:.75rem;align-items:center}
+    .btn{padding:.55rem 1.25rem;border-radius:8px;border:none;cursor:pointer;font-size:.88rem;font-weight:600;transition:.2s}
+    .btn-primario{background:var(--rose);color:#fff}
+    .btn-primario:hover{opacity:.88}
+    .btn-contorno{background:transparent;border:1.5px solid currentColor;color:inherit}
+    .btn-contorno:hover{background:rgba(255,255,255,.12)}
+    .btn-perigo{background:#c0392b;color:#fff}
+    .btn-sm{padding:.35rem .85rem;font-size:.8rem}
+    .container{max-width:900px;margin:0 auto;padding:2rem 1.5rem}
+
+    /* Setup token */
+    #tela-token{display:flex;align-items:center;justify-content:center;min-height:80vh}
+    .card-token{background:#fff;border:1px solid var(--borda);border-radius:16px;padding:2.5rem;max-width:480px;width:100%;text-align:center}
+    .card-token h2{color:var(--vinho);margin-bottom:.5rem}
+    .card-token p{font-size:.9rem;color:#666;margin-bottom:1.5rem;line-height:1.6}
+    .card-token a{color:var(--rose)}
+    .input{width:100%;padding:.7rem 1rem;border:1.5px solid var(--borda);border-radius:8px;font-size:.9rem;margin-bottom:1rem;outline:none}
+    .input:focus{border-color:var(--rose)}
+
+    /* Lista de posts */
+    #tela-lista{display:none}
+    .lista-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem}
+    .lista-header h2{color:var(--vinho);font-size:1.3rem}
+    .post-item{background:#fff;border:1px solid var(--borda);border-radius:12px;padding:1.1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;gap:1rem}
+    .post-info{flex:1}
+    .post-nome{font-weight:600;font-size:.95rem;margin-bottom:.2rem}
+    .post-data{font-size:.78rem;color:#888}
+    .post-acoes{display:flex;gap:.5rem;flex-shrink:0}
+    .aviso{text-align:center;color:#888;padding:3rem;font-size:.9rem}
+
+    /* Editor */
+    #tela-editor{display:none}
+    .editor-header{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem}
+    .editor-header h2{color:var(--vinho);font-size:1.2rem;flex:1}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+    .form-grupo{display:flex;flex-direction:column;gap:.3rem}
+    .form-grupo.full{grid-column:1/-1}
+    label{font-size:.8rem;font-weight:600;color:var(--vinho)}
+    select{width:100%;padding:.65rem 1rem;border:1.5px solid var(--borda);border-radius:8px;font-size:.88rem;background:#fff;outline:none}
+    select:focus{border-color:var(--rose)}
+    .editor-label{font-size:.8rem;font-weight:600;color:var(--vinho);margin-bottom:.3rem;display:block}
+    .rodape-editor{display:flex;gap:1rem;margin-top:1.5rem;justify-content:flex-end}
+    .status{font-size:.85rem;padding:.5rem 1rem;border-radius:8px;display:none}
+    .status.ok{background:#d4edda;color:#155724;display:block}
+    .status.erro{background:#f8d7da;color:#721c24;display:block}
+    .status.carregando{background:#fff3cd;color:#856404;display:block}
+
+    @media(max-width:600px){
+      .form-grid{grid-template-columns:1fr}
+      .post-item{flex-direction:column;align-items:flex-start}
+    }
+  </style>
+</head>
+<body>
+
+<div class="topo">
+  <h1>📝 Painel do Blog</h1>
+  <div class="topo-acoes">
+    <span id="usuario-nome" style="font-size:.85rem;opacity:.8"></span>
+    <button class="btn btn-contorno btn-sm" id="btn-sair" onclick="sair()" style="display:none">Sair</button>
+  </div>
+</div>
+
+<!-- TELA 1: Token -->
+<div id="tela-token">
+  <div class="card-token">
+    <div style="font-size:3rem;margin-bottom:1rem">🔑</div>
+    <h2>Acessar Painel</h2>
+    <p>Para publicar artigos diretamente no GitHub, insira um <strong>Token de Acesso</strong> da sua conta GitHub.<br><br>
+    <a href="https://github.com/settings/tokens/new?scopes=repo&description=Blog+Dra+Priscila" target="_blank">Clique aqui para gerar o token</a> — marque apenas a opção <strong>repo</strong> e clique em "Generate token". Cole abaixo:</p>
+    <input type="password" class="input" id="input-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+    <button class="btn btn-primario" style="width:100%" onclick="salvarToken()">Entrar</button>
+    <div id="status-token" class="status" style="margin-top:.75rem"></div>
+  </div>
+</div>
+
+<!-- TELA 2: Lista de posts -->
+<div id="tela-lista">
+  <div class="container">
+    <div class="lista-header">
+      <h2>Artigos do Blog</h2>
+      <button class="btn btn-primario" onclick="novoArtigo()">+ Novo Artigo</button>
+    </div>
+    <div id="lista-posts"></div>
+  </div>
+</div>
+
+<!-- TELA 3: Editor -->
+<div id="tela-editor">
+  <div class="container">
+    <div class="editor-header">
+      <button class="btn btn-contorno" onclick="voltarLista()" style="color:var(--vinho);border-color:var(--borda)">← Voltar</button>
+      <h2 id="editor-titulo-topo">Novo Artigo</h2>
+    </div>
+
+    <div style="background:#fff;border:1px solid var(--borda);border-radius:16px;padding:2rem">
+      <div class="form-grid">
+        <div class="form-grupo full">
+          <label>Título do artigo *</label>
+          <input type="text" class="input" id="f-titulo" placeholder="Ex: Ômega-3 e saúde feminina" style="margin:0">
+        </div>
+        <div class="form-grupo">
+          <label>Data de publicação *</label>
+          <input type="date" class="input" id="f-data" style="margin:0">
+        </div>
+        <div class="form-grupo">
+          <label>Categoria *</label>
+          <select id="f-categoria">
+            <option>Suplementação</option>
+            <option>Bem-estar</option>
+            <option>Saúde Hormonal</option>
+            <option>Nutrição</option>
+            <option>Hormônios</option>
+            <option>Gravidez e Puerpério</option>
+          </select>
+        </div>
+        <div class="form-grupo">
+          <label>Emoji do artigo</label>
+          <select id="f-emoji">
+            <option value="☀️">☀️ Sol (vitaminas)</option>
+            <option value="🌙">🌙 Lua (sono/ansiedade)</option>
+            <option value="🩸">🩸 Sangue (ferro/ferritina)</option>
+            <option value="💊">💊 Cápsula (suplementação)</option>
+            <option value="🌿">🌿 Planta (nutrição)</option>
+            <option value="🧬">🧬 DNA (hormônios)</option>
+            <option value="🌸">🌸 Flor (ciclo feminino)</option>
+            <option value="🤱">🤱 Amamentação (maternidade)</option>
+            <option value="⚡">⚡ Energia (disposição)</option>
+            <option value="🧠">🧠 Cérebro (mental/foco)</option>
+          </select>
+        </div>
+        <div class="form-grupo">
+          <label>Cor de fundo do emoji</label>
+          <select id="f-cor">
+            <option value="rosa">Rosa suave</option>
+            <option value="creme">Creme neutro</option>
+            <option value="vinho">Rosa intenso</option>
+          </select>
+        </div>
+        <div class="form-grupo">
+          <label>Cor do card na listagem</label>
+          <select id="f-capa">
+            <option value="post-capa-rosa">Rosa</option>
+            <option value="post-capa-creme">Creme</option>
+            <option value="post-capa-vinho">Vinho</option>
+          </select>
+        </div>
+        <div class="form-grupo">
+          <label>Tempo de leitura (minutos)</label>
+          <input type="number" class="input" id="f-leitura" value="5" min="1" max="30" style="margin:0">
+        </div>
+        <div class="form-grupo">
+          <label>Assunto no WhatsApp</label>
+          <input type="text" class="input" id="f-wpp" placeholder="Ex: Ômega-3" style="margin:0">
+        </div>
+        <div class="form-grupo full">
+          <label>Descrição SEO (aparece no Google)</label>
+          <input type="text" class="input" id="f-descricao" placeholder="Resumo do artigo para o Google (até 160 caracteres)" style="margin:0">
+        </div>
+        <div class="form-grupo full">
+          <label>Resumo do card (aparece na listagem do blog)</label>
+          <textarea class="input" id="f-resumo" rows="2" placeholder="1 a 2 frases resumindo o artigo" style="margin:0;resize:vertical"></textarea>
+        </div>
+      </div>
+
+      <div style="margin:1rem 0">
+        <span class="editor-label">Conteúdo do artigo *</span>
+        <textarea id="editor-corpo"></textarea>
+      </div>
+
+      <div class="form-grupo" style="margin-top:1rem">
+        <label>Texto final (chamada para consulta)</label>
+        <textarea class="input" id="f-cta" rows="2" placeholder="Ex: Se você se identificou com esses sintomas, agende uma consulta..." style="margin:0;resize:vertical"></textarea>
+      </div>
+
+      <div id="status-editor" class="status" style="margin-top:1rem"></div>
+
+      <div class="rodape-editor">
+        <button class="btn btn-contorno" onclick="voltarLista()" style="color:var(--vinho);border-color:var(--borda)">Cancelar</button>
+        <button class="btn btn-primario" onclick="publicar()">✓ Publicar Artigo</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
+<script>
+const REPO = 'drapriscilatavaresv/drapriscilatavaresv.github.io';
+const BRANCH = 'main';
+let token = localStorage.getItem('gh_token_priscila');
+let editor = null;
+let arquivoEditando = null;
+let shaEditando = null;
+
+// ── Inicialização ──────────────────────────────────────────
+window.onload = () => {
+  if (token) iniciarSessao();
+};
+
+async function salvarToken() {
+  const t = document.getElementById('input-token').value.trim();
+  if (!t) return;
+  setStatus('status-token', 'Verificando...', 'carregando');
+  try {
+    const r = await ghGet('user');
+    token = t;
+    localStorage.setItem('gh_token_priscila', t);
+    document.getElementById('usuario-nome').textContent = r.name || r.login;
+    document.getElementById('btn-sair').style.display = 'block';
+    setStatus('status-token', '', '');
+    iniciarSessao();
+  } catch(e) {
+    token = null;
+    setStatus('status-token', 'Token inválido. Verifique e tente novamente.', 'erro');
+  }
+}
+
+async function iniciarSessao() {
+  try {
+    const r = await ghGet('user');
+    document.getElementById('usuario-nome').textContent = r.name || r.login;
+    document.getElementById('btn-sair').style.display = 'block';
+  } catch(e) { sair(); return; }
+  mostrarTela('lista');
+  carregarPosts();
+}
+
+function sair() {
+  localStorage.removeItem('gh_token_priscila');
+  token = null;
+  document.getElementById('usuario-nome').textContent = '';
+  document.getElementById('btn-sair').style.display = 'none';
+  mostrarTela('token');
+}
+
+// ── API GitHub ─────────────────────────────────────────────
+async function ghGet(path) {
+  const r = await fetch(`https://api.github.com/${path}`, {
+    headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
+  });
+  if (!r.ok) throw new Error(r.status);
+  return r.json();
+}
+
+async function ghGetContents(path) {
+  return ghGet(`repos/${REPO}/contents/${path}?ref=${BRANCH}`);
+}
+
+async function ghPut(path, content, sha, mensagem) {
+  const body = { message: mensagem, content: btoa(unescape(encodeURIComponent(content))), branch: BRANCH };
+  if (sha) body.sha = sha;
+  const r = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
+    method: 'PUT',
+    headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (!r.ok) { const e = await r.json(); throw new Error(e.message); }
+  return r.json();
+}
+
+async function ghDelete(path, sha, mensagem) {
+  const r = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
+    method: 'DELETE',
+    headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message: mensagem, sha, branch: BRANCH })
+  });
+  if (!r.ok) throw new Error(r.status);
+}
+
+// ── Lista de posts ─────────────────────────────────────────
+async function carregarPosts() {
+  const el = document.getElementById('lista-posts');
+  el.innerHTML = '<p class="aviso">Carregando artigos...</p>';
+  try {
+    const arquivos = await ghGetContents('_posts');
+    const posts = arquivos.filter(f => f.name.endsWith('.md')).reverse();
+    if (!posts.length) { el.innerHTML = '<p class="aviso">Nenhum artigo encontrado. Crie o primeiro!</p>'; return; }
+    el.innerHTML = posts.map(p => {
+      const partes = p.name.replace('.md','').split('-');
+      const data = partes.slice(0,3).join('-');
+      const slug = partes.slice(3).join('-');
+      return `<div class="post-item">
+        <div class="post-info">
+          <div class="post-nome">${slug.replace(/-/g,' ')}</div>
+          <div class="post-data">📅 ${formatarData(data)}</div>
+        </div>
+        <div class="post-acoes">
+          <button class="btn btn-contorno btn-sm" style="color:var(--vinho);border-color:var(--borda)" onclick="editarPost('${p.name}')">✏️ Editar</button>
+          <button class="btn btn-perigo btn-sm" onclick="excluirPost('${p.name}')">🗑</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    el.innerHTML = '<p class="aviso">Erro ao carregar artigos.</p>';
+  }
+}
+
+// ── Editor ─────────────────────────────────────────────────
+function novoArtigo() {
+  arquivoEditando = null;
+  shaEditando = null;
+  document.getElementById('editor-titulo-topo').textContent = 'Novo Artigo';
+  document.getElementById('f-titulo').value = '';
+  document.getElementById('f-data').value = new Date().toISOString().split('T')[0];
+  document.getElementById('f-categoria').value = 'Suplementação';
+  document.getElementById('f-emoji').value = '💊';
+  document.getElementById('f-cor').value = 'rosa';
+  document.getElementById('f-capa').value = 'post-capa-rosa';
+  document.getElementById('f-leitura').value = '5';
+  document.getElementById('f-wpp').value = '';
+  document.getElementById('f-descricao').value = '';
+  document.getElementById('f-resumo').value = '';
+  document.getElementById('f-cta').value = 'Se você se identificou com algum dos sintomas descritos, agende uma consulta para avaliarmos o seu caso de forma individualizada.';
+  setStatus('status-editor','','');
+  mostrarTela('editor');
+  iniciarEditor('');
+}
+
+async function editarPost(nome) {
+  mostrarTela('editor');
+  document.getElementById('editor-titulo-topo').textContent = 'Editar Artigo';
+  setStatus('status-editor','Carregando artigo...','carregando');
+  try {
+    const dados = await ghGetContents(`_posts/${nome}`);
+    shaEditando = dados.sha;
+    arquivoEditando = nome;
+    const conteudo = decodeURIComponent(escape(atob(dados.content.replace(/\n/g,''))));
+    const { front, corpo } = parseFrontMatter(conteudo);
+    document.getElementById('f-titulo').value = front.title || '';
+    document.getElementById('f-data').value = front.date ? front.date.toString().slice(0,10) : '';
+    document.getElementById('f-categoria').value = front.category || 'Suplementação';
+    document.getElementById('f-emoji').value = front.emoji || '💊';
+    document.getElementById('f-cor').value = front.cor_fundo || 'rosa';
+    document.getElementById('f-capa').value = front.capa_class || 'post-capa-rosa';
+    document.getElementById('f-leitura').value = front.reading_time || '5';
+    document.getElementById('f-wpp').value = front.whatsapp_text || '';
+    document.getElementById('f-descricao').value = front.description || '';
+    document.getElementById('f-resumo').value = front.resumo || '';
+    document.getElementById('f-cta').value = front.cta_text || '';
+    setStatus('status-editor','','');
+    iniciarEditor(corpo);
+  } catch(e) {
+    setStatus('status-editor','Erro ao carregar artigo.','erro');
+  }
+}
+
+function iniciarEditor(conteudo) {
+  if (editor) { editor.toTextArea(); editor = null; }
+  document.getElementById('editor-corpo').value = conteudo;
+  editor = new EasyMDE({
+    element: document.getElementById('editor-corpo'),
+    spellChecker: false,
+    placeholder: 'Escreva o conteúdo do artigo aqui...\n\n## Subtítulo\n\nParágrafo de texto.\n\n- Item de lista\n- Outro item\n\n> Citação em destaque',
+    toolbar: ['bold','italic','|','heading-2','heading-3','|','unordered-list','ordered-list','|','quote','|','preview'],
+    minHeight: '350px'
+  });
+}
+
+async function publicar() {
+  const titulo = document.getElementById('f-titulo').value.trim();
+  const data = document.getElementById('f-data').value;
+  const corpo = editor ? editor.value().trim() : '';
+  if (!titulo || !data || !corpo) {
+    setStatus('status-editor','Preencha pelo menos Título, Data e Conteúdo.','erro'); return;
+  }
+  setStatus('status-editor','Publicando...','carregando');
+  const slug = titulo.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9\s-]/g,'').trim().replace(/\s+/g,'-');
+  const nomeArquivo = arquivoEditando || `${data}-${slug}.md`;
+  const frontMatter = gerarFrontMatter(titulo, data);
+  const conteudoFinal = `${frontMatter}\n${corpo}\n`;
+  try {
+    await ghPut(`_posts/${nomeArquivo}`, conteudoFinal, shaEditando, `${arquivoEditando ? 'Atualiza' : 'Novo artigo'}: ${titulo}`);
+    setStatus('status-editor','✅ Artigo publicado! O site atualiza em 1-2 minutos.','ok');
+    arquivoEditando = nomeArquivo;
+    setTimeout(()=>{ voltarLista(); carregarPosts(); }, 2500);
+  } catch(e) {
+    setStatus('status-editor',`Erro ao publicar: ${e.message}`,'erro');
+  }
+}
+
+async function excluirPost(nome) {
+  if (!confirm(`Excluir o artigo "${nome}"? Esta ação não pode ser desfeita.`)) return;
+  try {
+    const dados = await ghGetContents(`_posts/${nome}`);
+    await ghDelete(`_posts/${nome}`, dados.sha, `Remove artigo: ${nome}`);
+    carregarPosts();
+  } catch(e) { alert('Erro ao excluir.'); }
+}
+
+// ── Utilitários ────────────────────────────────────────────
+function gerarFrontMatter(titulo, data) {
+  const f = (id) => document.getElementById(id).value;
+  return `---
+layout: post
+title: "${titulo.replace(/"/g,'\\"')}"
+date: ${data}
+category: ${f('f-categoria')}
+emoji: "${f('f-emoji')}"
+cor_fundo: ${f('f-cor')}
+capa_class: ${f('f-capa')}
+reading_time: ${f('f-leitura')}
+description: "${f('f-descricao').replace(/"/g,'\\"')}"
+resumo: "${f('f-resumo').replace(/"/g,'\\"')}"
+cta_text: "${f('f-cta').replace(/"/g,'\\"')}"
+whatsapp_text: "${f('f-wpp').replace(/"/g,'\\"')}"
+---\n`;
+}
+
+function parseFrontMatter(texto) {
+  const match = texto.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
+  if (!match) return { front: {}, corpo: texto };
+  const front = {};
+  match[1].split('\n').forEach(linha => {
+    const i = linha.indexOf(':');
+    if (i < 0) return;
+    const chave = linha.slice(0,i).trim();
+    let valor = linha.slice(i+1).trim().replace(/^"|"$/g,'');
+    front[chave] = valor;
+  });
+  return { front, corpo: match[2].trim() };
+}
+
+function formatarData(iso) {
+  if (!iso) return '';
+  const [a,m,d] = iso.split('-');
+  const meses = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+  return `${parseInt(d)} de ${meses[parseInt(m)-1]} de ${a}`;
+}
+
+function mostrarTela(tela) {
+  document.getElementById('tela-token').style.display = tela==='token' ? 'flex' : 'none';
+  document.getElementById('tela-lista').style.display = tela==='lista' ? 'block' : 'none';
+  document.getElementById('tela-editor').style.display = tela==='editor' ? 'block' : 'none';
+}
+
+function voltarLista() { mostrarTela('lista'); }
+
+function setStatus(id, msg, tipo) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = 'status' + (tipo ? ` ${tipo}` : '');
+}
+</script>
+</body>
+</html>
