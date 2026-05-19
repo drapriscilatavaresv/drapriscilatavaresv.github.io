@@ -76,20 +76,22 @@ p  { color: var(--texto-suave); font-size: 1rem; line-height: 1.75; }
   padding: .85rem 2rem;
   border-radius: 50px;
   font-size: .93rem;
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: .02em;
   transition: var(--t);
   border: 2px solid transparent;
   white-space: nowrap;
   cursor: pointer;
 }
 .btn-primario {
-  background: var(--vinho);
+  background: var(--vinho-claro);
   color: var(--branco);
-  border-color: var(--vinho);
+  border-color: var(--vinho-claro);
+  text-shadow: 0 1px 2px rgba(0,0,0,.25);
 }
 .btn-primario:hover {
-  background: var(--vinho-escuro);
-  border-color: var(--vinho-escuro);
+  background: var(--vinho);
+  border-color: var(--vinho);
   transform: translateY(-2px);
   box-shadow: var(--sombra-m);
 }
@@ -151,11 +153,11 @@ p  { color: var(--texto-suave); font-size: 1rem; line-height: 1.75; }
   justify-content: space-between;
 }
 .logo img {
-  height: 68px;
+  height: 100px;
   width: auto;
   transition: height var(--t);
 }
-.site-header.rolado .logo img { height: 50px; }
+.site-header.rolado .logo img { height: 72px; }
 
 .nav-menu {
   display: flex;

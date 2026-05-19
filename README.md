@@ -1,34 +1,31 @@
 # Dra. Priscila Tavares — Site Oficial
 
-Site institucional com blog, desenvolvido com Jekyll e hospedado no GitHub Pages.
+Site estático hospedado no **GitHub Pages** (sem Jekyll — servido diretamente pelo `.nojekyll`).
 
 ## Como publicar no GitHub Pages
 
-### 1. Criar repositório no GitHub
-1. Acesse [github.com](https://github.com) e faça login
+### 1. Criar o repositório no GitHub
+1. Acesse [github.com](https://github.com) com o usuário **drapriscilatavaresv**
 2. Clique em **New repository**
-3. Nome sugerido: `dra-priscila-tavares` (ou `SEU-USUARIO.github.io` para URL mais curta)
+3. Nome do repositório: `drapriscilatavaresv.github.io`
+   - Com esse nome, o site ficará em: `https://drapriscilatavaresv.github.io/`
 4. Deixe **público**
 5. Clique em **Create repository**
 
-### 2. Configurar o `_config.yml`
-Antes de subir os arquivos, edite `_config.yml` e atualize:
-```yaml
-url: "https://SEU-USUARIO.github.io"
-baseurl: "/dra-priscila-tavares"  # ou "" se o repo se chamar SEU-USUARIO.github.io
-```
+### 2. Subir os arquivos
+Abra o Terminal, navegue até a pasta do site e execute:
 
-### 3. Subir os arquivos
 ```bash
-cd priscila-tavares-site
+cd ~/Downloads/priscila-tavares-site
 git init
 git add .
-git commit -m "Lançamento do site"
-git remote add origin https://github.com/SEU-USUARIO/dra-priscila-tavares.git
+git commit -m "Lançamento do site da Dra. Priscila Tavares"
+git branch -M main
+git remote add origin https://github.com/drapriscilatavaresv/drapriscilatavaresv.github.io.git
 git push -u origin main
 ```
 
-### 4. Ativar o GitHub Pages
+### 3. Ativar o GitHub Pages
 1. No repositório, clique em **Settings**
 2. No menu lateral, clique em **Pages**
 3. Em **Source**, selecione `Deploy from a branch`
@@ -36,51 +33,36 @@ git push -u origin main
 5. Clique em **Save**
 
 O site ficará disponível em alguns minutos em:
-`https://SEU-USUARIO.github.io/dra-priscila-tavares/`
+**https://drapriscilatavaresv.github.io/**
 
-## Como rodar localmente
-
-```bash
-gem install bundler
-bundle install
-bundle exec jekyll serve
-```
-Acesse: `http://localhost:4000`
+> Não é necessário `_config.yml` — o arquivo `.nojekyll` instrui o GitHub Pages a servir os arquivos HTML diretamente, sem processamento Jekyll.
 
 ## Como adicionar um novo post no blog
 
-1. Crie um arquivo em `_posts/` com o formato: `AAAA-MM-DD-titulo-do-post.md`
-2. Adicione o cabeçalho (front matter):
-
-```yaml
----
-layout: post
-title: "Título do artigo"
-date: 2025-06-01
-category: "Suplementação"
-icon: "🌿"
-reading_time: 5
-excerpt: "Resumo breve do artigo que aparece na listagem do blog."
----
-
-Conteúdo do artigo em Markdown...
-```
-
-3. Salve e faça push para o GitHub — o site atualiza automaticamente.
+1. Copie um dos arquivos em `blog/` (ex: `blog/vitamina-d.html`)
+2. Renomeie para `blog/nome-do-artigo.html`
+3. Edite o conteúdo HTML dentro de `<div class="artigo-corpo">`
+4. Adicione o link para o novo artigo em `blog.html` e na seção de preview em `index.html`
+5. Faça push para o GitHub — o site atualiza automaticamente
 
 ## Estrutura de arquivos
 
 ```
-├── _config.yml          # Configurações do Jekyll
-├── _layouts/            # Templates HTML
-├── _posts/              # Posts do blog
-├── assets/
-│   ├── css/style.css    # Estilos do site
-│   ├── js/main.js       # JavaScript
-│   └── images/          # Fotos e logo
-├── index.html           # Página inicial
-├── sobre.html           # Sobre a Dra. Priscila
-├── servicos.html        # Como posso ajudar
-├── blog/index.html      # Listagem do blog
-└── agendamento.html     # Agendamento
+priscila-tavares-site/
+├── .nojekyll               ← diz ao GitHub Pages para não usar Jekyll
+├── index.html              ← Página inicial
+├── sobre.html              ← Sobre a Dra. Priscila
+├── servicos.html           ← Como posso ajudar
+├── blog.html               ← Listagem do blog
+├── agendamento.html        ← Agendamento e contato
+├── blog/
+│   ├── vitamina-d.html     ← Artigo: Vitamina D
+│   ├── magnesio.html       ← Artigo: Magnésio
+│   └── ferro.html          ← Artigo: Ferro e ferritina
+└── assets/
+    ├── css/style.css        ← Todos os estilos
+    └── images/
+        ├── logo.png         ← Logo da Dra. Priscila
+        ├── foto-hero.jpg    ← Foto da hero (blusa rosa)
+        └── foto-sobre.png   ← Foto da seção Sobre (blusa vinho)
 ```
