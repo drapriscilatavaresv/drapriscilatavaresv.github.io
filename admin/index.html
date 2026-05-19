@@ -215,9 +215,9 @@ async function salvarToken() {
   const t = document.getElementById('input-token').value.trim();
   if (!t) return;
   setStatus('status-token', 'Verificando...', 'carregando');
+  token = t;
   try {
     const r = await ghGet('user');
-    token = t;
     localStorage.setItem('gh_token_priscila', t);
     document.getElementById('usuario-nome').textContent = r.name || r.login;
     document.getElementById('btn-sair').style.display = 'block';
