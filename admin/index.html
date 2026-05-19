@@ -218,6 +218,11 @@ async function salvarToken() {
   token = t;
   try {
     const r = await ghGet('user');
+    if (r.login !== 'drapriscilatavaresv') {
+      token = null;
+      setStatus('status-token', 'Acesso não autorizado.', 'erro');
+      return;
+    }
     localStorage.setItem('gh_token_priscila', t);
     document.getElementById('usuario-nome').textContent = r.name || r.login;
     document.getElementById('btn-sair').style.display = 'block';
@@ -232,6 +237,7 @@ async function salvarToken() {
 async function iniciarSessao() {
   try {
     const r = await ghGet('user');
+    if (r.login !== 'drapriscilatavaresv') { sair(); return; }
     document.getElementById('usuario-nome').textContent = r.name || r.login;
     document.getElementById('btn-sair').style.display = 'block';
   } catch(e) { sair(); return; }
