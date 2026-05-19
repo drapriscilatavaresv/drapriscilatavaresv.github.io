@@ -1,0 +1,70 @@
+backend:
+  name: github
+  repo: drapriscilatavaresv/drapriscilatavaresv.github.io
+  branch: main
+  auth_type: pkce
+  app_id: Iv23liMN2M7gN56FfOI0
+
+locale: pt
+
+media_folder: assets/images
+public_folder: /assets/images
+
+collections:
+  - name: blog
+    label: Artigos do Blog
+    folder: _posts
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    extension: md
+    format: frontmatter
+    editor:
+      preview: false
+    fields:
+      - { label: "Título", name: title, widget: string, hint: "Título completo do artigo" }
+      - { label: "Data", name: date, widget: datetime, format: "YYYY-MM-DD", date_format: "DD/MM/YYYY", time_format: false }
+      - label: "Categoria"
+        name: category
+        widget: select
+        options:
+          - Suplementação
+          - Bem-estar
+          - Saúde Hormonal
+          - Nutrição
+          - Hormônios
+          - Gravidez e Puerpério
+      - label: "Emoji"
+        name: emoji
+        widget: select
+        hint: "Ícone que aparece no topo do artigo"
+        options:
+          - { label: "☀️ Sol (vitaminas)", value: "☀️" }
+          - { label: "🌙 Lua (sono/ansiedade)", value: "🌙" }
+          - { label: "🩸 Sangue (ferro/ferritina)", value: "🩸" }
+          - { label: "💊 Cápsula (suplementação)", value: "💊" }
+          - { label: "🌿 Planta (nutrição)", value: "🌿" }
+          - { label: "🧬 DNA (hormônios)", value: "🧬" }
+          - { label: "🌸 Flor (ciclo feminino)", value: "🌸" }
+          - { label: "🤱 Amamentação (maternidade)", value: "🤱" }
+          - { label: "⚡ Energia (disposição)", value: "⚡" }
+          - { label: "🧠 Cérebro (mental/foco)", value: "🧠" }
+      - label: "Cor de fundo do emoji"
+        name: cor_fundo
+        widget: select
+        options:
+          - { label: "Rosa suave (padrão)", value: rosa }
+          - { label: "Creme neutro", value: creme }
+          - { label: "Rosa intenso", value: vinho }
+      - label: "Cor do card na listagem"
+        name: capa_class
+        widget: select
+        options:
+          - { label: "Rosa", value: post-capa-rosa }
+          - { label: "Creme", value: post-capa-creme }
+          - { label: "Vinho", value: post-capa-vinho }
+      - { label: "Tempo de leitura (minutos)", name: reading_time, widget: number, default: 5, value_type: int }
+      - { label: "Descrição SEO", name: description, widget: string, hint: "Resumo para o Google (até 160 caracteres)" }
+      - { label: "Resumo do card", name: resumo, widget: text, hint: "Texto curto que aparece na listagem do blog (1-2 frases)" }
+      - { label: "Conteúdo do artigo", name: body, widget: markdown }
+      - { label: "Texto do CTA (chamada ao final)", name: cta_text, widget: text, hint: "Frase de encerramento convidando para a consulta" }
+      - { label: "Assunto no WhatsApp", name: whatsapp_text, widget: string, hint: "Ex: Vitamina D — aparece na mensagem automática do WhatsApp" }
