@@ -223,6 +223,12 @@ async function salvarToken() {
       setStatus('status-token', 'Acesso não autorizado.', 'erro');
       return;
     }
+    const repo = await ghGet(`repos/${REPO}`);
+    if (!repo.permissions || !repo.permissions.push) {
+      token = null;
+      setStatus('status-token', 'Este token não tem permissão de escrita no repositório.', 'erro');
+      return;
+    }
     localStorage.setItem('gh_token_priscila', t);
     document.getElementById('usuario-nome').textContent = r.name || r.login;
     document.getElementById('btn-sair').style.display = 'block';
