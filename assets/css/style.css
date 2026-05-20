@@ -183,7 +183,7 @@ p  { color: var(--texto-suave); font-size: 1rem; line-height: 1.75; }
   transition: width var(--t);
 }
 .nav-menu a:hover,
-.nav-menu a.ativo { color: var(--vinho); }
+.nav-menu a.ativo {color: rgba(255,255,255,.97);}
 .nav-menu a:hover::after,
 .nav-menu a.ativo::after { width: 100%; }
 .nav-menu .nav-cta { margin-left: .5rem; }
