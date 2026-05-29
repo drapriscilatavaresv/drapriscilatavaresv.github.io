@@ -217,20 +217,26 @@
       .contato-final-grid { grid-template-columns: 1fr; gap: 2.5rem; }
     }
     @media (max-width: 1060px) {
-      /* ── Hero mobile: foto full-width com título sobreposto ── */
+      /* ── Hero mobile: foto primeiro, texto abaixo ── */
       .hero {
-        display: block !important;
+        display: flex !important;
+        flex-direction: column;
         min-height: auto;
         background: var(--creme);
       }
 
-      /* Foto ocupa a largura toda */
+      /* Foto vai para o topo (DOM tem texto primeiro) */
       .hero-col-foto {
+        order: -1;
         position: relative;
         width: 100%;
-        height: 88vw;
-        max-height: 520px;
-        min-height: 280px;
+        height: 110vw;
+        max-height: 620px;
+        min-height: 320px;
+        flex-shrink: 0;
+      }
+      .hero-col-foto img {
+        object-position: top center;
       }
 
       /* Gradiente escuro na parte inferior da foto */
@@ -241,8 +247,8 @@
         background: linear-gradient(
           to top,
           rgba(10,2,5,.82) 0%,
-          rgba(10,2,5,.18) 48%,
-          transparent 72%
+          rgba(10,2,5,.12) 45%,
+          transparent 68%
         );
         z-index: 1;
       }
@@ -284,11 +290,14 @@
         margin: 0;
       }
 
-      /* Coluna de texto abaixo da foto — esconde o título (já mostrado na foto) */
+      /* Coluna de texto abaixo da foto */
       .hero-col-texto {
+        order: 0;
         padding: 2.5rem 1.5rem 3rem;
+        padding-left: 1.5rem;
         background: var(--creme);
         justify-content: flex-start;
+        align-items: flex-start;
       }
       .hero-glass {
         max-width: 100%;
@@ -300,9 +309,11 @@
         box-shadow: none;
         border-radius: 0;
       }
-      /* Esconde o título no bloco de texto (já aparece sobre a foto) */
+      /* Título já aparece sobre a foto, esconde no bloco abaixo */
       .hero-titulo-glass { display: none; }
-      .hero-sub-glass { color: var(--texto); max-width: 100%; }
+      /* Também esconde a tag (duplicaria a info da overlay) */
+      .hero-tag { display: none; }
+      .hero-sub-glass { color: var(--texto); max-width: 100%; margin-top: 0; }
     }
     @media (max-width: 768px) {
       .sobre-foto-filhos { aspect-ratio: 3/2; }
