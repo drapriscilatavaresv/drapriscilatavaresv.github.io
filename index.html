@@ -88,6 +88,17 @@
     /* ══ Overlay mobile — escondido no desktop ══ */
     .hero-foto-overlay { display: none; }
 
+    /* ══ NAV overlay backdrop (mobile) ══ */
+    .nav-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.45);
+      z-index: 999;
+      cursor: pointer;
+    }
+    .nav-overlay.ativo { display: block; }
+
     /* ══ NAV sobre hero claro — cores escuras ══ */
     .nav-menu a.ativo { color: var(--vinho); }
 
@@ -346,6 +357,7 @@
     </nav>
   </div>
 </header>
+<div class="nav-overlay" id="nav-overlay"></div>
 
 <!-- ===== HERO ===== -->
 <section class="hero" id="inicio">
@@ -873,24 +885,33 @@
 const header = document.getElementById('header');
 const hamburguer = document.getElementById('hamburguer');
 const navMenu = document.getElementById('nav-menu');
+const navOverlay = document.getElementById('nav-overlay');
 
 window.addEventListener('scroll', () => {
   header.classList.toggle('rolado', window.scrollY > 40);
 }, { passive: true });
 
+function fecharMenu() {
+  hamburguer.classList.remove('aberto');
+  navMenu.classList.remove('aberto');
+  navOverlay.classList.remove('ativo');
+  document.body.style.overflow = '';
+  hamburguer.setAttribute('aria-expanded', 'false');
+}
+
 hamburguer.addEventListener('click', () => {
+  const abrindo = !navMenu.classList.contains('aberto');
   hamburguer.classList.toggle('aberto');
   navMenu.classList.toggle('aberto');
-  document.body.style.overflow = navMenu.classList.contains('aberto') ? 'hidden' : '';
-  hamburguer.setAttribute('aria-expanded', navMenu.classList.contains('aberto'));
+  navOverlay.classList.toggle('ativo', abrindo);
+  document.body.style.overflow = abrindo ? 'hidden' : '';
+  hamburguer.setAttribute('aria-expanded', String(abrindo));
 });
 
+navOverlay.addEventListener('click', fecharMenu);
+
 navMenu.querySelectorAll('a').forEach(a => {
-  a.addEventListener('click', () => {
-    hamburguer.classList.remove('aberto');
-    navMenu.classList.remove('aberto');
-    document.body.style.overflow = '';
-  });
+  a.addEventListener('click', fecharMenu);
 });
 
 // Scroll-reveal animation
