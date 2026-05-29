@@ -328,6 +328,13 @@
     }
     @media (max-width: 768px) {
       .sobre-foto-filhos { aspect-ratio: 3/2; }
+
+      /* Corrige inset-block: 0 não suportado em iOS Safari antigo */
+      .nav-menu {
+        top: 0 !important;
+        bottom: 0 !important;
+        height: 100dvh !important;
+      }
     }
   </style>
 </head>
