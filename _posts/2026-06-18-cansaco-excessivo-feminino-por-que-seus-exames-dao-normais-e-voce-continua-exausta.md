@@ -31,8 +31,7 @@ interpretação literal dos valores de referência dos laboratórios. Esses núm
 baseados em médias populacionais — ou seja, eles servem para identificar doenças graves,
 mas não necessariamente para garantir que você esteja vivendo com saúde plena.
 
->> O Caso da Ferritina e da Vitamina D:
-
+>O Caso da Ferritina e da Vitamina D:
 Para uma mulher se sentir bem, não basta que sua Ferritina (estoque de ferro) esteja
 "dentro do limite" de 15 ng/mL. Para muitas, o bem-estar e a disposição só aparecem
 quando esses níveis estão acima de 70 ou 80 ng/mL. O mesmo acontece com a Vitamina D:
