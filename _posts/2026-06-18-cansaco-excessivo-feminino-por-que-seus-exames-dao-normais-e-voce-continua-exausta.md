@@ -41,12 +41,12 @@ precisamos de níveis otimizados.
 
 ## 3 Causas Comuns de Cansaço que os Exames Comuns Ignoram
 
-- 1. Deficiências Nutricionais Subclínicas: Você pode não ter uma anemia profunda, mas
+- 1 . Deficiências Nutricionais Subclínicas: Você pode não ter uma anemia profunda, mas
 níveis limítrofes de ferro, B12 e magnésio já são suficientes para causar "névoa mental"
 e fadiga.
-- 2. Desequilíbrios Hormonais Sutis: Pequenas oscilações no cortisol ou na tireoide, que
+- 2 . Desequilíbrios Hormonais Sutis: Pequenas oscilações no cortisol ou na tireoide, que
 ainda não configuram uma doença, podem drenar sua energia vital.
-- 3. Inflamação Crônica de Baixo Grau: Má alimentação, estresse e falta de sono geram
+- 3 . Inflamação Crônica de Baixo Grau: Má alimentação, estresse e falta de sono geram
 uma inflamação silenciosa que o corpo tenta combater, gastando toda a sua reserva de
 energia.
 
